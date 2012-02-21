@@ -79,29 +79,29 @@ associations(ctable, alpha=0.05, p.zero.correction = 1/sum(ctable)^2)
 }
 \references{
 
-  Agresti, Alan 2002. Categorical Data Analysis (2nd
+  Agresti, A. (2002) Categorical Data Analysis (2nd
   edition). Hoboken: John Wiley & Sons, Hoboken.
 
-  Arppe, A. 2008. Univariate, bivariate and multivariate methods in
+  Arppe, A. (2008) Univariate, bivariate and multivariate methods in
   corpus-based lexicography -- a study of synonymy. Publications of
   the Department of General Linguistics, University of Helsinki,
   No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
 
-  Cohen, J. 1988. Statistical power analysis for the behavioral
+  Cohen, J. (1988) Statistical power analysis for the behavioral
   sciences, (2nd edition). Hillsdale: Lawrence Erlbaum Associates.
 
-  Cramer, H. 1946. Mathematical Methods in Statistics. Princeton:
+  Cramer, H. (1946) Mathematical Methods in Statistics. Princeton:
   Princeton University Press.
 
-  Goodman, L. A. and W. H. Kruskal 1954. Measures of Association for
+  Goodman, L. A. and W. H. Kruskal (1954) Measures of Association for
   Cross- Classifications. Journal of the American Statistical
   Association, Vol. 49, No.  268 (December 1954), pp. 732--764.
 
-  Liebetrau, A. M. 1983. Measures of Association. Sage University
+  Liebetrau, A. M. (1983) Measures of Association. Sage University
   Paper series on Quantitative Applications in the Social Sciences,
   07-032. Beverly Hills and London: Sage Publications.
 
-  Theil, H. 1970. On the Estimation of Relationships Involving
+  Theil, H. (1970) On the Estimation of Relationships Involving
   Qualitative Variables. The American Journal of Sociology, Vol. 76,
   No. 1 (July 1970), pp.  103--154.
 
@@ -110,7 +110,7 @@ associations(ctable, alpha=0.05, p.zero.correction = 1/sum(ctable)^2)
 Antti Arppe
 }
 \seealso{
-See also \code{\link{posthoc.cells}}, \code{\link{chisq.test}}.
+See also \code{\link{chisq.posthoc}}, \code{\link{chisq.test}}.
 }
 \section{Acknowledgements}{
 

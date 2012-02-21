@@ -95,17 +95,17 @@ estimates are normalized by setting \code{p.normalize} as \code{TRUE}
 }
 \references{
 
-Arppe, A. 2008. Univariate, bivariate and multivariate methods in
+Arppe, A. (2008) Univariate, bivariate and multivariate methods in
 corpus-based lexicography -- a study of synonymy. Publications of the
 Department of General Linguistics, University of Helsinki,
 No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
 
-Arppe, A. 2009. Linguistic choices vs. probabilities -- how much and
-what can linguistic theory explain? In: Featherston, Sam & Winkler,
-Susanne (eds.) The Fruits of Empirical Linguistics. Volume 1:
-Process. Berlin: de Gruyter, pp. 1--24.
+Arppe, A. (2009) Linguistic choices vs. probabilities -- how much and
+what can linguistic theory explain? In: Featherston, S. and S. Winkler,
+(eds.) The Fruits of Empirical Linguistics. Volume 1: Process. Berlin:
+de Gruyter, pp. 1--24.
 
-Rifkin, R. and Klautau, A. 2004. In Defense of One-Vs-All Classification. 
+Rifkin, R. and A. Klautau (2004) In Defense of One-Vs-All Classification. 
 Journal of Machine Learning Research, pp. 101--141.
 
 }

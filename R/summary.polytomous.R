@@ -6,20 +6,10 @@ function(object, ...)
   return(object)
 }
 
-#summary.mer <-
-#function(object, ...)
-#{
-#  require(lme4, quietly=TRUE)
-#  summary(object, ...)
-#}
-
-
-print.summary.polytomous <- function(x, digits=max(3,getOption("digits")-3), parameter="odds", max.parameter=ifelse(parameter=="odds",10000,100), max.print=10, cycles=0, max.denominator=0, ...)
+print.summary.polytomous <- function(x, digits=max(3,getOption("digits")-3), parameter="odds", max.parameter=ifelse(parameter=="odds",10000,100), p.critical=.05, max.print=10, cycles=0, max.denominator=0, ...)
 { 
   require(MASS, quietly=TRUE)
-  if(!is.null(x$max.print) & is.numeric(x$max.print))
-    max.print=x$max.print;
-  
+
   cat("\nFormula:\n")
   print(x$formula)
 
@@ -64,8 +54,10 @@ print.summary.polytomous <- function(x, digits=max(3,getOption("digits")-3), par
   for(i in 1:dim.parameters[1])
      for(j in 1:dim.parameters[2])
         if(!is.na(p.values[i,j]) & !is.na(char.parameters[i,j]))
-          if(p.values[i,j]>=.05)
+          if(p.values[i,j]>=p.critical)
             char.parameters[i,j] <- paste("(",char.parameters[i,j],")",sep="")
+  if(is.na(max.print))
+    max.print <- nrow(char.parameters)
   print.data.frame(as.data.frame(char.parameters)[1:min(nrow(char.parameters),max.print),], na.print="NA")
 
   if(nrow(char.parameters)>max.print)

@@ -1,4 +1,4 @@
-posthoc.cells <- function(ctable, alpha=0.05, reorder="both", std.pearson.residual.min=2)
+chisq.posthoc <- function(ctable, alpha=0.05, reorder="both", std.pearson.residual.min=2)
 {
   if(reorder %in% c("rows","both"))
     ctable <- ctable[order(apply(ctable,1,sum),decreasing=TRUE),] 

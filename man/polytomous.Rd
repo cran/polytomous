@@ -56,7 +56,7 @@ polytomous(formula, data, heuristic = "one.vs.rest", \dots)
 
     The maximum number of rows of the \code{parameter} to be output
     when printing with \code{print.summary.polytomous}; by default
-    equal to 10.
+    equal to 10; if set to \code{NA}, all rows will be output.
 
 }
   \item{\dots}{
@@ -147,33 +147,43 @@ polytomous(formula, data, heuristic = "one.vs.rest", \dots)
   functions, the \code{polytomous} package also contains two functions
   for the univariate analysis data with categorical (nominal), unordered
   variables, namely \code{\link{associations}} and
-  \code{\link{posthoc.cells}}.
+  \code{\link{chisq.posthoc}}.
 
 }
 \references{
 
-Arppe, A. 2008. Univariate, bivariate and multivariate methods in
+Arppe, A. (2008) Univariate, bivariate and multivariate methods in
 corpus-based lexicography -- a study of synonymy. Publications of the
 Department of General Linguistics, University of Helsinki,
 No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
 
-Arppe, A. 2009. Linguistic choices vs. probabilities -- how much and
-what can linguistic theory explain? In: Featherston, Sam & Winkler,
-Susanne (eds.) The Fruits of Empirical Linguistics. Volume 1:
-Process. Berlin: de Gruyter, pp. 1--24.
+Arppe, A. (2009) Linguistic choices vs. probabilities -- how much and
+what can linguistic theory explain? In: Featherston, S. & S. Winkler
+(eds.) The Fruits of Empirical Linguistics. Volume 1: Process. Berlin:
+de Gruyter, pp. 1--24.
 
-Antti. A. (in prep.)
+Antti. A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 
 }
 \author{
-Antti Arppe, with ideas and input from R. Harald Baayen
+Antti Arppe
+}
+\section{Acknowledgments}{
+
+Ideas and input provided by R. Harald Baayen as well as Terrance
+M. Nearey in the development of the
+\code{\link{polytomous.poisson.reformulation}} function allowing for
+mixed-effects logistic regression modeling of polytomous outcome
+settings are greatly appreciated.
+
 }
 
 \seealso{
 \code{\link{polytomous.one.vs.rest}}, \code{\link{polytomous.poisson.reformulation}}, 
 \code{\link{summary.polytomous}}, \code{\link{anova.polytomous}},
 \code{\link{predict.polytomous}}, \code{\link{plot.polytomous}},
-\code{\link{posthoc.cells}}, \code{\link{associations}}
+\code{\link{chisq.posthoc}}, \code{\link{associations}}
 }
 \examples{
 

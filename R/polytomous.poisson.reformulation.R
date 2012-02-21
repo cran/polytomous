@@ -38,8 +38,8 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
     model.type="mixed"
   else
     model.type="fixed";
-  variables <- levels(as.factor(unlist(lapply(attr(terms.formula(formula),"term.labels"),function(x) strsplit(x,"[ ]*([\\+]|[\\|]|[:])[ ]*")))))
-  if(length(grep("^1$", variables))!=0) variables <- variables[-grep("^1$", variables)];
+  variables <- levels(as.factor(unlist(lapply(attr(terms.formula(formula),"term.labels"),function(x) strsplit(x,"[ ]*([\\+]|[\\*]|[\\|]|[:])[ ]*")))))
+  if(length(grep("^1$", variables))!=0) variables <- variables[-grep("^1$", variables)]
 
   if(!is.null(variables.ordered))
     { if(length(variables.ordered)>length(unique(variables.ordered)))
@@ -80,7 +80,7 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
   if(model.type=="fixed")
     { if(include.Observation)
           formula.start <- paste(formula.start," Observation",sep="")
-      predictors.fixed <- variables;
+      predictors.fixed <- variables.fixed <- variables;
 
       if(data.format=="instance" | data.format=="narrow")
         formula.poisson <- paste(c(formula.start, outcome, unlist(lapply(predictors, function(x) paste(c(outcome,x),collapse=":")))),collapse=" + ");
@@ -121,13 +121,14 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
     { if(include.Observation)
         formula.start <- paste(formula.start,"(1|Observation)",sep="");
       predictors.fixed <- predictors[-grep("\\|",predictors)];
+      variables.fixed <- unique(unlist(lapply(predictors.fixed,function(x) strsplit(x,":")[[1]])))
       predictors.random <- unlist(lapply(grep("\\|",predictors,value=TRUE), function(x) paste(c("(",x,")"),collapse="")));
       formula.poisson <- paste(c(formula.start, outcome, unlist(lapply(predictors.fixed, function(x) paste(c(outcome,x),collapse=":"))),predictors.random),collapse=" + ");
 
       require(lme4, quietly=TRUE);
       model <- try(lmer(formula.poisson, data.poisson, family=poisson),silent=TRUE);
       if("try-error" %in% class(model))
-        stop("Following error in fitting reformulated model using 'lmer(..., family=poisson)':\n",model[1])
+        stop("Following error(s) in fitting reformulated model using 'lmer(..., family=poisson)':\n",model[1])
 
       coefs.mer <- function(object)
       { 
@@ -169,9 +170,9 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
   probabilities <- as.vector(t(probabilities.matrix));
   fitted.poisson <- cbind(counts, probabilities);
 
-  predictors.fixed.combinations <- apply(data.poisson[predictors.fixed],1,function(x) paste(as.character(x), collapse="::"))
-  variables2observations <- lapply(unique(predictors.fixed.combinations), function(x) as.numeric(as.character(unique(data.poisson$Observation[which(x==predictors.fixed.combinations)]))))
-  names(variables2observations) <- unique(predictors.fixed.combinations);
+  variables.fixed.combinations <- apply(data.poisson[variables.fixed],1,function(x) paste(as.character(x), collapse="::"))
+  variables2observations <- lapply(unique(variables.fixed.combinations), function(x) as.numeric(as.character(unique(data.poisson$Observation[which(x==variables.fixed.combinations)]))))
+  names(variables2observations) <- unique(variables.fixed.combinations);
 #  variables2observations <- rle(apply(data.poisson[variables],1,function(x) paste(x, collapse="::")))$values;
 
   transform.data <- function(data, numeric2discrete=function(x) cut2(x,levels.mean=TRUE,g=g.numeric), g.numeric=2, ...)
@@ -191,10 +192,10 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
 
   predictions <- NULL;
   if(data.format=="instance")
-    { data.transformed <- transform.data(data[predictors.fixed], ...);
+    { data.transformed <- transform.data(data[variables.fixed], ...);
       for(i in 1:n.data)
 #         predictions <- rbind(predictions, probabilities.matrix[which(variables2observations %in% apply(as.matrix(data[i,variables],1),1,function(x) paste(x, collapse="::"))),]);
-         { indices <- variables2observations[[as.vector(apply(as.matrix(data.transformed[i,predictors.fixed]),1,function(x) paste(as.character(x), collapse="::")))]];
+         { indices <- variables2observations[[as.vector(apply(as.matrix(data.transformed[i,variables.fixed]),1,function(x) paste(as.character(x), collapse="::")))]];
            predictions <- rbind(predictions, apply(matrix(probabilities.matrix[indices,],nrow=length(indices)),2,mean))
          }
       colnames(predictions) <- outcomes

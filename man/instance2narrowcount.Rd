@@ -119,7 +119,8 @@ has the following common columns:
 
 \references{
 
-Arppe, A. (in prep.)
+Antti. A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 
 }
 \author{

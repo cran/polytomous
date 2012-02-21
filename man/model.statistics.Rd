@@ -90,9 +90,15 @@ model.statistics(observed, predicted, p.values, frequency = NA,
 }
 \references{
 
-Arppe, A., and Baayen, R. H. (in prep.)
+Arppe, A. (2008) Univariate, bivariate and multivariate methods in
+corpus-based lexicography -- a study of synonymy. Publications of the
+Department of General Linguistics, University of Helsinki,
+No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
 
-Hosmer, David W., Jr., and Stanley Lemeshow 2000. Applied Regression Analysis 
+Arppe, A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
+
+Hosmer, D. W., Jr., and S. Lemeshow (2000) Applied Regression Analysis 
 (2nd edition). New York: Wiley.
 
 }

@@ -41,10 +41,10 @@ function(formula, data, frequency=NA, p.normalize=TRUE, ...)
  logodds <- p.values <- predictions <- NULL;
 
  for(m in 1:n.outcomes)
-    { logodds.model <- as.matrix(coef(model[[m]]));
+    { logodds.model <- as.matrix(coef(model[[m]])); colnames(logodds.model) <- outcomes[m];
       logodds <- merge(logodds,logodds.model,by=0,all=TRUE); rownames(logodds) <- logodds[,"Row.names"]; logodds <- logodds[-1];
 
-      p.values.model <- as.matrix(summary(model[[m]])$coefficients[,"Pr(>|z|)"]);
+      p.values.model <- as.matrix(summary(model[[m]])$coefficients[,"Pr(>|z|)"]); colnames(p.values.model) <- outcomes[m];
       p.values <- merge(p.values,p.values.model,by=0,all=TRUE); rownames(p.values) <- p.values[,"Row.names"]; p.values <- p.values[-1];
 
       predictions <- cbind(predictions, fitted(model[[m]]));

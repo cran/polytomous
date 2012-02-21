@@ -14,7 +14,7 @@
 
 \method{print}{summary.polytomous}(x, digits = max(3, getOption("digits") - 3),
    parameter="odds", max.parameter=ifelse(parameter=="odds",10000,100),
-   max.print=10, cycles=0, max.denominator=0, \dots)
+   p.critical=.05, max.print=10, cycles=0, max.denominator=0, \dots)
 }
 \arguments{
 \item{object}{
@@ -38,10 +38,14 @@
     "1/Inf", "-Inf"}; see \code{Details} for the default limit values
     and specific outputs for the different \code{parameter} types.
     }
+\item{p.critical}{
+   The critical P-value for considering a parameter value significant;
+   by default set to \code{P=.05} as is common in the humanities.
+   }
 \item{max.print}{
     The maximum number of rows of the \code{parameter} to be output
     when printing with \code{print.summary.polytomous}; by default
-    equal to 10.
+    set to 10; if set to \code{NA} all rows will be output.
   }
 \item{cycles}{
     A value to be passed on to the \code{fractions} function in the
@@ -62,6 +66,11 @@
 \details{
   Calculates descriptive statistics of a fitted Polytomous Logistic
   Regression model and prints a nice summary of the key results.
+
+  Parameters for which the respective P-value is greater than the
+  critical threshold value (set with \code{p.critical} by default as
+  \code{P=.05}), i.e. which would be considered as not significant,
+  are output within parentheses, e.g. \code{"(1.1)"}.
 
   For \code{parameter="odds"}, the default maximum output limit value is
   \code{max.parameter=10000}.  With this default value, \code{"Inf"}
@@ -86,7 +95,8 @@
 }
 
 \references{
-Arppe, A. (in prep.)
+Antti. A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 }
 
 \author{

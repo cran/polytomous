@@ -13,7 +13,8 @@ a \code{"logical"} format
   format, where each unique value of each multinomial variable is
   represented by a corresponding logical variable.
 
-} \usage{ multinomial2logical(data, outcome=NULL, variables=NULL) }
+}
+\usage{multinomial2logical(data, outcome=NULL, variables=NULL)}
 \arguments{ \item{data}{
 
   a data frame (or an object that can be coerced into such) with
@@ -53,7 +54,7 @@ a \code{"logical"} format
   corresponding logical variable is \code{TRUE}, whereas otherwise it
   is \code{FALSE}. Each logical variable is named as a combination of
   the corresponding original multinomial variable (column) name and
-  variable value, separated by a period (sQuote{.}). For instance, the
+  variable value, separated by a period (\sQuote{.}). For instance, the
   logical variable corresponding to any occurrence of \code{"Group"}
   class of the variable \code{"Agent"} in the \code{think} dataset is
   named \code{"Agent.Group"}.
@@ -67,12 +68,13 @@ a \code{"logical"} format
 
 \references{
 
-Arppe, A. 2008. Univariate, bivariate and multivariate methods in
+Arppe, A. (2008) Univariate, bivariate and multivariate methods in
 corpus-based lexicography -- a study of synonymy. Publications of the
 Department of General Linguistics, University of Helsinki,
 No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
 
-Arppe, A. (in prep.)
+Arppe, A. (in prep.)  Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 
 }
 \author{

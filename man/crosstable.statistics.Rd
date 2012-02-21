@@ -23,20 +23,28 @@ crosstable.statistics(ctable)
     \item{\code{accuracy}}{Overall prediction accuracy}
     \item{\code{recall.predicted}}{Recall of prediction for each outcome value}
     \item{\code{precision.predicted}}{Precision of prediction for each outcome value}
-    \item{\code{lambda.prediction}}{lambda for prediction accuracy (improvement over baseline of always predicting mode)}
-    \item{\code{tau.classification}}{tau for classification accuracy (improvement over baseline of homogeneous distribution of predicted outcomes)}
-    \item{\code{d.lambda.prediction}}{d(lambda): used for calculating \code{P(lambda)}}
-    \item{\code{d.tau.classification}}{d(tau): used for calculating \code{P(tau)}}
-    \item{\code{p.lambda.prediction}}{P(lambda): probability of reaching \code{lambda} by chance}
-    \item{\code{p.tau.classification}}{P(tau): probability of reaching \code{tau} by chance}
+    \item{\code{lambda.prediction}}{\eqn{\lambda_{prediction}}: improvement in prediction accuracy over baseline of always predicting mode}
+    \item{\code{tau.classification}}{\eqn{\tau_{classification}}: improvement in classification accuracy over baseline of homogeneous distribution of predicted outcomes}
+    \item{\code{d.lambda.prediction}}{\eqn{d(\lambda_{prediction})}: used for calculating \code{p.lambda.prediction}}
+    \item{\code{d.tau.classification}}{\eqn{d(\tau_{classification})}: used for calculating \code{p.tau.classification}}
+    \item{\code{p.lambda.prediction}}{\eqn{P(\lambda_{prediction})}: probability of reaching \eqn{\lambda_{prediction}} by chance}
+    \item{\code{p.tau.classification}}{\eqn{P(\tau_{classification})}: probability of reaching \eqn{\tau_{classification}} by chance}
   }
 }
 \references{
-  Arppe, Antti (in prep.).
 
-  Menard, Scott (1995). Applied Logistic Regression Analysis. Sage University Paper 
-  Series on Quantitative Applications in the Social Sciences 07-106. Thousand 
-  Oaks: Sage Publications. 
+  Arppe, A. (2008) Univariate, bivariate and multivariate methods in
+  corpus-based lexicography -- a study of synonymy. Publications of
+  the Department of General Linguistics, University of Helsinki,
+  No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
+
+  Arppe, A. (in prep.) Solutions for fixed and mixed effects modeling of
+  polytomous outcome settings.
+
+  Menard, S. (1995). Applied Logistic Regression Analysis. Sage
+  University Paper Series on Quantitative Applications in the Social
+  Sciences 07-106. Thousand Oaks: Sage Publications.
+
 }
 \author{
 Antti Arppe

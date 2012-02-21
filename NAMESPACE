@@ -1,4 +1,6 @@
 import("lme4")
+import("Hmisc")
+import("MASS")
 
 export(
 "polytomous",
@@ -10,10 +12,12 @@ export(
 "model.statistics",
 "crosstable.statistics",
 "associations",
-"posthoc.cells",
+"chisq.posthoc",
 "ranef.polytomous",
 "anova.polytomous",
+"anova.polytomouslist",
 "summary.polytomous",
+"print.summary.polytomous",
 "predict.polytomous",
 "plot.polytomous",
 "plot.polytomous.parameters",
@@ -30,4 +34,4 @@ S3method("plot","polytomous")
 S3method("plot","polytomous.parameters")
 S3method("plot","polytomous.probabilities")
 
-exportClasses("polytomous","mer")
+exportClasses("polytomous","mer","summary.mer")

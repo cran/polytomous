@@ -20,8 +20,8 @@ print.polytomous <-
 function(x, max.print=10, ...)
 {
   digits=max(3,getOption("digits")-3)
-  if(!is.null(x$max.print) & is.numeric(x$max.print))
-    max.print=x$max.print
+  if(is.na(max.print))
+    max.print <- nrow(x$odds)
 
   cat("\nFormula:\n")
   print.formula(x$formula)

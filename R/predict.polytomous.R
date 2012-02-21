@@ -10,7 +10,10 @@ function(object, newdata=NULL, type="response", p.normalize=TRUE, ...)
     if(type=="link")
       predictions <- sapply(outcomes, function(w) predict.glm(model[[w]],newdata,type="link"))
     if(type %in% c("response","choice"))
-      predictions <- sapply(outcomes, function(w) predict.glm(model[[w]],newdata,type="response"))
+      { predictions <- sapply(outcomes, function(w) predict.glm(model[[w]],newdata,type="response"));
+        if(is.null(dim(predictions)))
+          { predictions <- data.frame(t(as.matrix(predictions))); colnames(predictions) <- outcomes; }
+      }
     if(type=="terms")
       { predictions <- lapply(outcomes, function(w) predict.glm(model[[w]],newdata,type))
         names(predictions) <- outcomes

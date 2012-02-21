@@ -119,7 +119,8 @@ Analysis of Model Fit for Polytomous Logistic Regression models
      }
 }
 \references{
-Arppe, A. (in prep.)
+Antti. A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 }
 \author{
 Antti Arppe

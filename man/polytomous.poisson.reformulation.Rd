@@ -140,17 +140,18 @@ polytomous.poisson.reformulation(formula, data, frequency = NA,
 }
 \references{
 
-Arppe, A. (in prep.)
+Arppe, A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 
 Faraway, J. J. (2006). Extending the Linear Model with R. Boca Raton:
 Chapman & Hall/CRC, 101-102.
 
-Venables, W. N., Ripley, B. D. (2002). Modern Applied Statistics with S
+Venables, W. N. and B. D. Ripley (2002). Modern Applied Statistics with S
 (4th edition). New York: Springer, 199-202.
 
 }
 \author{
-Antti Arppe and R. Harald Baayen, with ideas from Terrance M. Nearey
+Antti Arppe, with ideas from R. Harald Baayen and Terrance M. Nearey
 }
 
 \seealso{

@@ -120,17 +120,18 @@ mfrow=NULL, main=NULL, legend.position="topright", \dots)
 }
 \references{
 
-Arppe, A. 2008. Univariate, bivariate and multivariate methods in
+Arppe, A. (2008) Univariate, bivariate and multivariate methods in
 corpus-based lexicography -- a study of synonymy. Publications of the
 Department of General Linguistics, University of Helsinki,
 No. 44. URN: http://urn.fi/URN:ISBN:978-952-10-5175-3.
 
-Arppe, A. 2009. Linguistic choices vs. probabilities -- how much and
-what can linguistic theory explain? In: Featherston, Sam & Winkler,
-Susanne (eds.) The Fruits of Empirical Linguistics. Volume 1:
+Arppe, A. (2009) Linguistic choices vs. probabilities -- how much and
+what can linguistic theory explain? In: Featherston, S. and
+S. Winkler, (eds.) The Fruits of Empirical Linguistics. Volume 1:
 Process. Berlin: de Gruyter, pp. 1--24.
 
-Antti. A. (in prep.)
+Antti. A. (in prep.) Solutions for fixed and mixed effects modeling of
+polytomous outcome settings.
 
 }
 \author{
@@ -151,10 +152,10 @@ plot(think.polytomous, values="logodds", type="hist", panes="multiple")
 plot(think.polytomous, values="logodds", type="density", panes="multiple")
 plot(think.polytomous, values="logodds", type="density", panes="multiple",
    predictors="Section*")
-plot(think.polytomous, values="weights", type="density", panes="multiple",
+plot(think.polytomous, values="logodds", type="density", panes="multiple",
    predictors="Patient*")
-plot(think.polytomous, values="weights", type="hist", panes="multiple", col=1:4)
-plot(think.polytomous, values="weights", type="density", panes="single",
+plot(think.polytomous, values="logodds", type="hist", panes="multiple", col=1:4)
+plot(think.polytomous, values="logodds", type="density", panes="single",
    outcomes=c("ajatella","miettia","pohtia","harkita"))
 
 plot(think.polytomous, values="probabilities")
