@@ -149,5 +149,5 @@ identical(think.polytomous$odds, think.polytomous2$odds)
 identical(round(think.polytomous$odds,5),round(think.polytomous2$odds,5))
 
 }
-\keyword{ regression }
+\keyword{ regression multivariate category classif }
 

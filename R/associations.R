@@ -77,7 +77,7 @@ associations <- function(ctable, alpha=0.05, p.zero.correction=1/sum(ctable)^2)
 
 # Log-likelihood chi-squared (G2) test of independence (homogeneity)
   likelihood.ratio <- 2*sum(chisq.results$observed*log(chisq.results$observed/chisq.results$expected))
-  alpha.G2 <- pchisq(likelihood.ratio,df=(ctable.rows-1)*(ctable.cols-1),lower=FALSE);
+  alpha.G2 <- pchisq(likelihood.ratio,df=(ctable.rows-1)*(ctable.cols-1),lower.tail=FALSE);
 
 # Cramér's V
   cramers.v <- sqrt(chisq.results$statistic/(N*(min(ctable.rows,ctable.cols)-1)));
@@ -112,8 +112,8 @@ associations <- function(ctable, alpha=0.05, p.zero.correction=1/sum(ctable)^2)
   ASE.lambda.RC <- sqrt(var.lambda.RC);
   z.lambda.RC <- lambda.RC/ASE.lambda.RC;
   z.lambda.CR <- lambda.CR/ASE.lambda.CR;
-  p.lambda.RC <- (pnorm(z.lambda.RC,lower=FALSE))*2;
-  p.lambda.CR <- (pnorm(z.lambda.CR,lower=FALSE))*2;
+  p.lambda.RC <- (pnorm(z.lambda.RC,lower.tail=FALSE))*2;
+  p.lambda.CR <- (pnorm(z.lambda.CR,lower.tail=FALSE))*2;
 #  p.lambda.RC <- 1-pnorm(z.lambda.RC);
 #  p.lambda.CR <- 1-pnorm(z.lambda.CR);
 
@@ -136,7 +136,7 @@ associations <- function(ctable, alpha=0.05, p.zero.correction=1/sum(ctable)^2)
   z.tau.CR <- tau.CR/ASE.tau.CR;
 #  p.tau.CR <- 1-pnorm(z.tau.CR);
   U.tau.CR <- (N-1)*(ctable.cols-1)*tau.CR; # Chi-squared approximation for H0 according to Margolin & Light (1974), see also Liebetrau (1983)
-  p.tau.CR <- pchisq(U.tau.CR,df=(ctable.rows-1)*(ctable.cols-1),lower=FALSE);
+  p.tau.CR <- pchisq(U.tau.CR,df=(ctable.rows-1)*(ctable.cols-1),lower.tail=FALSE);
 
 # Tau Row|Column
   n.err.unconditional <- N^2;
@@ -155,7 +155,7 @@ associations <- function(ctable, alpha=0.05, p.zero.correction=1/sum(ctable)^2)
   z.tau.RC <- tau.CR/ASE.tau.RC;
 #  p.tau.RC <- 1-pnorm(z.tau.RC);
   U.tau.RC <- (N-1)*(ctable.rows-1)*tau.RC; # Chi-squared approximation for H0 according to Margolin & Light 1974, see also Liebetrau 1983
-  p.tau.RC <- pchisq(U.tau.RC,df=(ctable.rows-1)*(ctable.cols-1),lower=FALSE);
+  p.tau.RC <- pchisq(U.tau.RC,df=(ctable.rows-1)*(ctable.cols-1),lower.tail=FALSE);
 
 # Theil's UC (1970)
   hx= -sum((apply(ctable,1,sum)*log(apply(ctable,1,sum)/N))/N);
@@ -174,8 +174,8 @@ associations <- function(ctable, alpha=0.05, p.zero.correction=1/sum(ctable)^2)
   ASE.uc.CR <- sqrt(var.uc.CR);
   z.uc.RC <- uc.RC/ASE.uc.RC;
   z.uc.CR <- uc.CR/ASE.uc.CR;
-  p.uc.RC <- pnorm(z.uc.RC,lower=FALSE)*2; # N.B. SPSS appears to use the log-likelihood chi-squared test (G2) to assess the significance of UC.
-  p.uc.CR <- pnorm(z.uc.CR,lower=FALSE)*2; # Thus, the significance value is the same in both directions.
+  p.uc.RC <- pnorm(z.uc.RC,lower.tail=FALSE)*2; # N.B. SPSS appears to use the log-likelihood chi-squared test (G2) to assess the significance of UC.
+  p.uc.CR <- pnorm(z.uc.CR,lower.tail=FALSE)*2; # Thus, the significance value is the same in both directions.
 #  p.uc.RC <- 1-pnorm(z.uc.RC);
 #  p.uc.CR <- 1-pnorm(z.uc.CR);
 
@@ -189,7 +189,7 @@ associations <- function(ctable, alpha=0.05, p.zero.correction=1/sum(ctable)^2)
   effect.size <- sqrt(sum(((p1-p0)^2)/p0));
   noncentrality <- N*(effect.size^2);
   d.f=(ctable.rows-1)*(ctable.cols-1);
-  beta <- pchisq(qchisq(alpha,df=d.f,lower=FALSE),df=d.f,ncp=noncentrality);
+  beta <- pchisq(qchisq(alpha,df=d.f,lower.tail=FALSE),df=d.f,ncp=noncentrality);
   power <- 1-beta;
 
   results <- list(alpha.X2 = alpha.X2, alpha.G2 = alpha.G2, beta = beta, power = power, effect.size = effect.size, likelihood.ratio = likelihood.ratio, cramers.v = cramers.v, lambda.RC = lambda.RC, lambda.CR = lambda.CR, tau.RC = tau.RC, tau.CR = tau.CR, uc.RC = uc.RC, uc.CR = uc.CR, uc.sym = uc.sym, p.lambda.RC = p.lambda.RC, p.lambda.CR = p.lambda.CR, p.tau.RC = p.tau.RC, p.tau.CR = p.tau.CR, p.uc.RC = p.uc.RC, p.uc.CR = p.uc.CR, var.lambda.RC = var.lambda.RC, var.lambda.CR = var.lambda.CR, var.tau.RC = var.tau.RC, var.tau.CR = var.tau.CR, var.uc.RC = var.uc.RC, var.uc.CR = var.uc.CR, ASE.lambda.RC = ASE.lambda.RC, ASE.lambda.CR = ASE.lambda.CR, ASE.tau.RC = ASE.tau.RC, ASE.tau.CR = ASE.tau.CR, ASE.uc.RC = ASE.uc.RC, ASE.uc.CR = ASE.uc.CR, noncentrality = noncentrality);

@@ -129,4 +129,4 @@ associations(ctable)
 associations(table(think$Agent, think$Patient))
 
 }
-\keyword{ univar }
+\keyword{ univar category }

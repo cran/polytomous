@@ -17,14 +17,15 @@
 
 }
 \usage{
-chisq.posthoc(ctable, alpha = 0.05, reorder = "both",
-   std.pearson.residual.min = 2)
+chisq.posthoc(ctable, alpha = 0.05, reorder = "none",
+   std.pearson.residual.min = 2, correct=FALSE)
 }
 \arguments{
     \item{ctable}{a two-way contigency table crosstabulating two, possible multiple-valued categorical, unordered variables}
     \item{alpha}{a numerical value between 0 and 1 specifying the critical P-value threshold for significance; by default set to 0.05}
-    \item{reorder}{a character string specifying whether the rows or columns of \code{ctable}, or both, should be reordered according to their descending marginal frequencies; possible values \code{"both"} (default), \code{"rows"}, or \code{"cols"}; if none of these, \code{ctable} will be left as it is.}
+    \item{reorder}{a character string specifying whether the rows or columns of \code{ctable}, or both, should be reordered according to their descending marginal frequencies; possible values \code{"none"} (default), \code{"both"}, \code{"rows"}, or \code{"cols"}; if none of these are provided, \code{ctable} will be left as it is.}
     \item{std.pearson.residual.min}{the minimum absolute value for considering a cellwise standardized Pearson residual in the contingency table to deviate significantly from the expected value (representing a homogeneous distribution); by default equal to 2.}
+    \item{correct}{a logical indicating whether to apply Yates' continuity correction when computing the test statistic; by default set to \code{FALSE}}
   }
 \value{
   A list with the following components:
@@ -35,8 +36,8 @@ chisq.posthoc(ctable, alpha = 0.05, reorder = "both",
     \item{\code{cells}}{a list of different assessments of the divergences of the cellwise values from expected values representing a homogeneous distribution, consisting of the following elements:}
     \describe{
       \item{\code{X2}}{the cellwise contributions to the chi-squared statistic, with the sign indicating whether the observed value is greater or less than the expected value.}
-      \item{\code{X2.df}}{the cellwise assessment of whether the chi-squared value of an individual cell by itself exceeds the overall minimum chi-squared value \code{X2.df} for a significantly non-homogeneous distribution of counts; having the values \sQuote{+} or \sQuote{-} when this is the case, with the sign indicating whether the cellwise observed value is greater or less than the expected value, or \sQuote{0} otherwise (indicating no significant divergence).}
-      \item{\code{X2.df1}}{the cellwise assessment of whether the chi-squared value of an individual cell exceeds the minimum chi-squared value \code{X2.df} when \code{df=1}; having the values \sQuote{+}, \sQuote{-}, or \sQuote{0}.}
+      \item{\code{X2.df.sign}}{the cellwise assessment of whether the chi-squared value of an individual cell by itself exceeds the overall minimum chi-squared value \code{X2.df} for a significantly non-homogeneous distribution of counts; having the values \sQuote{+} or \sQuote{-} when this is the case, with the sign indicating whether the cellwise observed value is greater or less than the expected value, or \sQuote{0} otherwise (indicating no significant divergence).}
+      \item{\code{X2.df1.sign}}{the cellwise assessment of whether the chi-squared value of an individual cell exceeds the minimum chi-squared value \code{X2.df} when \code{df=1}; having the values \sQuote{+}, \sQuote{-}, or \sQuote{0}.}
       \item{\code{std.pearson.residuals}}{the cellwise standardized Pearson residuals.}
       \item{\code{std.pearson.residuals.sign}}{the cellwise assessment of whether the absolute value of a standardized Pearson residual is greater than \code{std.pearson.residual.min}, having the values \sQuote{+}, \sQuote{-}, or \sQuote{0}.}
     }
@@ -55,6 +56,9 @@ chisq.posthoc(ctable, alpha = 0.05, reorder = "both",
  to an overall homogeneous distribution for the entire table) is 2 or
  more, this absolute threshold value should probably be increased to 3
  or more in the case of larger contingency tables (Agresti 2002).
+
+ With respect to minimum cell-wise expected counts, in contrast to
+ \code{\link{chisq.test}} no warnings will be output.
 
 }
 \references{
@@ -86,4 +90,4 @@ chisq.posthoc(ctable)
 
 chisq.posthoc(table(think$Agent, think$Patient))
 }
-\keyword{ univar }
+\keyword{ univar category }

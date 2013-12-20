@@ -3,6 +3,10 @@ import("Hmisc")
 import("MASS")
 
 export(
+"nominal",
+"print.nominal",
+"summary.nominal",
+"print.summary.nominal",
 "polytomous",
 "polytomous.one.vs.rest",
 "polytomous.poisson.reformulation",
@@ -21,9 +25,14 @@ export(
 "predict.polytomous",
 "plot.polytomous",
 "plot.polytomous.parameters",
-"plot.polytomous.probabilities"
+"plot.polytomous.probabilities",
+"extract.exemplars",
+"extract.prototypes"
 )
 
+S3method("print","nominal")
+S3method("summary","nominal")
+S3method("print","summary.nominal")
 S3method("anova","polytomous")
 S3method("anova","polytomouslist")
 S3method("print","polytomous")

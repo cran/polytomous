@@ -108,4 +108,4 @@ de Gruyter, pp. 1--24.
 ## For examples see examples(polytomous)
 
 }
-\keyword{datasets}
+\keyword{ datasets }

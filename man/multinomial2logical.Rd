@@ -14,7 +14,10 @@ a \code{"logical"} format
   represented by a corresponding logical variable.
 
 }
-\usage{multinomial2logical(data, outcome=NULL, variables=NULL)}
+\usage{multinomial2logical(data, outcome=NULL, variables=NULL,
+   variable.value.separator="")
+}
+
 \arguments{ \item{data}{
 
   a data frame (or an object that can be coerced into such) with
@@ -32,6 +35,13 @@ a \code{"logical"} format
 
   a list of the names of predictor variables (columns in \code{data})
   to be included in the creation of the resultant data frame.
+
+}
+  \item{variable.value.separator}{
+
+  a character (string) used in creating new column names for the
+  resultant data frame by pasting together variable names and their
+  respective variable values; by default \code{""}
 
 }
 }
@@ -54,10 +64,11 @@ a \code{"logical"} format
   corresponding logical variable is \code{TRUE}, whereas otherwise it
   is \code{FALSE}. Each logical variable is named as a combination of
   the corresponding original multinomial variable (column) name and
-  variable value, separated by a period (\sQuote{.}). For instance, the
-  logical variable corresponding to any occurrence of \code{"Group"}
-  class of the variable \code{"Agent"} in the \code{think} dataset is
-  named \code{"Agent.Group"}.
+  variable value, separated by the \code{variable.value.separator} (by
+  default \sQuote{}). For instance, the logical variable corresponding
+  to any occurrence of \code{"Group"} class of the variable
+  \code{"Agent"} in the \code{think} dataset is named
+  \code{"AgentGroup"}.
 
   If an \code{outcome} column is specified, the resultant data frame
   will have as its first column the corresponding multinomial
@@ -90,16 +101,16 @@ Antti Arppe
 data(think)
 think.logical <- multinomial2logical(think, outcome="Lexeme",
    variables=c("Agent","Patient"))
-think.polytomous1 <- polytomous(Lexeme ~ Agent.Individual + Agent.Group +
-  Patient.Abstraction + Patient.Activity, data=think.logical)
+think.polytomous1 <- polytomous(Lexeme ~ AgentIndividual + AgentGroup +
+  PatientAbstraction + PatientActivity, data=think.logical)
 summary(think.polytomous1)
 
-think.polytomous2 <- polytomous(Lexeme ~ Agent.Individual + Agent.Group +
-   Patient.Abstraction + Patient.Activity, data=think.logical,
+think.polytomous2 <- polytomous(Lexeme ~ AgentIndividual + AgentGroup +
+   PatientAbstraction + PatientActivity, data=think.logical,
    heuristic="poisson.reformulation",
    outcome.ordered=c("harkita","miettia","pohtia","ajatella"))
 summary(think.polytomous2)
 
 }
-\keyword{ regression }
+\keyword{ regression multivariate category }
 

@@ -1,6 +1,6 @@
 instance2narrowcount <-
 function(data.table, variables, outcome="OUTCOME", variables.default=NULL, outcome.ordered=NULL, numeric2discrete=function(x) cut2(x,levels.mean=TRUE,g=g.numeric), g.numeric=2)
-{ require(Hmisc, quietly=TRUE)
+{ 
   if(length(variables)>length(unique(variables)))
     stop(paste("Duplicate terms in 'variables': ",paste(variables,collapse=", "),sep=""));
   if(!all(variables %in% names(data.table)))

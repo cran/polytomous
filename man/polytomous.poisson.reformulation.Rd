@@ -187,5 +187,5 @@ ranef(think.lmer)
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate category classif }
 

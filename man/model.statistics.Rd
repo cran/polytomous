@@ -115,5 +115,5 @@ Antti Arppe
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate classif }
 

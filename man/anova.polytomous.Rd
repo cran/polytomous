@@ -152,4 +152,4 @@ anova(think.polytomous1, think.polytomous2, statistic="AIC", test=NULL)
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate }

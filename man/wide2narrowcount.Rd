@@ -136,5 +136,5 @@ summary(think.polytomous2)
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate category }
 

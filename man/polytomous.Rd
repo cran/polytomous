@@ -121,7 +121,7 @@ polytomous(formula, data, heuristic = "one.vs.rest", \dots)
    a list containing at least following components:
 
   \describe{
-  \item{\code{model}}{the underlying model(s) fitted using \code{\link{glm}} or \code{\link{lmer}}.}
+  \item{\code{model}}{the underlying model(s) fitted using \code{\link{glm}} or \code{\link{glmer}}.}
   \item{\code{data}}{the originally supplied \code{data} argument object.}
   \item{\code{frequency}}{the originally supplied \code{frequency} argument.}
   \item{\code{logodds}}{a matrix of the outcome-by-predictor logodds estimated for the model.}
@@ -144,10 +144,10 @@ polytomous(formula, data, heuristic = "one.vs.rest", \dots)
 \note{
 
   In addition to polytomous logistic regression modeling and auxiliary
-  functions, the \code{polytomous} package also contains two functions
-  for the univariate analysis data with categorical (nominal), unordered
-  variables, namely \code{\link{associations}} and
-  \code{\link{chisq.posthoc}}.
+  functions, the \code{polytomous} package also contains three functions
+  for the univariate analysis if data with categorical (nominal), unordered
+  variables, namely \code{\link{associations}},
+  \code{\link{chisq.posthoc}} and \code{\link{nominal}}.
 
 }
 \references{
@@ -183,7 +183,7 @@ settings are greatly appreciated.
 \code{\link{polytomous.one.vs.rest}}, \code{\link{polytomous.poisson.reformulation}}, 
 \code{\link{summary.polytomous}}, \code{\link{anova.polytomous}},
 \code{\link{predict.polytomous}}, \code{\link{plot.polytomous}},
-\code{\link{chisq.posthoc}}, \code{\link{associations}}
+\code{\link{nominal}},\code{\link{chisq.posthoc}}, \code{\link{associations}}
 }
 \examples{
 
@@ -210,5 +210,4 @@ summary(think.polytomous.lmer2)
 
 }
 
-\keyword{ regression }
-
+\keyword{ regression multivariate category classif }

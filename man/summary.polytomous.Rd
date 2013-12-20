@@ -118,4 +118,4 @@ print(summary(think.polytomous), digits=4, parameter="logodds")
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate category }

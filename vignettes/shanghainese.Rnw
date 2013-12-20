@@ -1,0 +1,813 @@
+\documentclass{article}
+\usepackage{Sweave}
+\usepackage{graphicx}
+
+\usepackage[english]{babel}
+\selectlanguage{english}
+\usepackage[utf8]{inputenc}
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim}
+{formatcom={\vspace{-1.5ex}},fontshape=sl,      % changed -2.5 to -1.5
+  fontfamily=courier,fontseries=b, fontsize=\scriptsize}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontfamily=courier,fontseries=b,%
+  fontsize=\scriptsize}
+
+\SweaveOpts{engine=R, eps=FALSE, pdf=TRUE, strip.white=all}
+\SweaveOpts{prefix=FALSE, prefix.string=fig, include=FALSE}
+\setkeys{Gin}{width=0.8\textwidth}
+
+%\VignetteIndexEntry{Polytomous logistic regression with Shanghainese topic marker data}
+
+\begin{document}
+
+\title{Polytomous logistic regression with Shanghainese topic markers}
+\author{Antti Arppe, Weifeng Han \& John Newman}
+\maketitle
+
+\section{Preparations}
+
+Before carrying out the statistical analyses, we need to invoke the
+polytomous package to make it available within R, having installed the
+package earlier. As subsequent preliminary steps, we load in the
+\texttt{shanghainese} data frame, and then take a look at its
+composition, scrutinizing the first six lines (output length by
+default for the function \texttt{head}) and the overall content of the
+data frame with the \texttt{summary} method:
+
+<<data, eval=T, echo=T>>=
+library(polytomous)
+data(shanghainese)
+head(shanghainese)
+
+summary(shanghainese)
+@
+
+%  TOPIC_MARKER TOPIC_LENGTH TOPIC_POS FUNCTION COMMENT_TYPE GENRE
+%1           ne            5       ADJ     CONT       CLAUSE INTER
+%2           ne            2       ADJ     EMPH       CLAUSE  MONO
+%3           ne            3       ADJ     INTR       CLAUSE  MONO
+%4           ne            2       ADV  COUNTER       CLAUSE  MONO
+%5           ne            2       ADV  COUNTER       PHRASE INTER
+%6           ne            4       ADV     INTR       PHRASE  MONO
+
+%'data.frame':	500 obs. of  6 variables:
+% $ TOPIC_MARKER: Factor w/ 5 levels "ne","a","mo",..: 1 1 1 1 1 1 1 1 1 1 ...
+% $ TOPIC_LENGTH: int  5 2 3 2 2 4 4 2 2 2 ...
+% $ TOPIC_POS   : Factor w/ 5 levels "NOM","ADJ","ADV",..: 2 2 2 3 3 3 3 3 3 3 ...
+% $ FUNCTION    : Factor w/ 5 levels "INTR","COUNTER",..: 4 5 1 2 2 1 4 4 2 1 ...
+% $ COMMENT_TYPE: Factor w/ 5 levels "CLAUSE","PHRASE",..: 1 1 1 1 2 2 2 3 1 1 ...
+% $ GENRE       : Factor w/ 4 levels "MONO","CONV",..: 3 1 1 1 3 1 1 3 1 1 ...
+
+\section{Univariate analysis}
+
+We start the univariate analysis by creating a cross-tabulation of the
+occurrences of the \textsc{introductory function} (TRUE) vs. its absence
+(FALSE):
+
+<<FUNCTION.INTR crosstabulation, eval=T, echo=T>>=
+table(shanghainese$FUNCTION=="INTR", shanghainese$TOPIC_MARKER)
+@
+
+%        ne  a mo zi ma
+%  FALSE 82 57 67 33 64
+%  TRUE  18 43 33 67 36
+
+We calculate the topic-marker-wise proportions (as percentages) of the
+\textsc{introductory function} (using the second column of the above
+cross-tabulation and dividing by the total frequency which is the same
+for all topic markers, i.e. 100):
+
+<<FUNCTION.INTR topic-marker-wise proportions, eval=T, echo=T>>=
+round(table(shanghainese$FUNCTION=="INTR", shanghainese$TOPIC_MARKER)[2,]*100/100)
+@
+
+%  ne   a    mo   zi   ma
+%  18   43   33   67   36 
+
+Likewise, we can also calculate the feature-wise distribution (as
+percentages) of the \textsc{introductory function} among the five
+topic markers (dividing the second column values by the overall
+frequency of the feature in question, i.e. 197):
+
+<<FUNCTION.INTR feature-wise proportions, eval=T, echo=T>>=
+round(table(shanghainese$FUNCTION=="INTR", shanghainese$TOPIC_MARKER)[2,]*100/197)
+@
+
+% ne1   a1  mo1 shi4  ma1 
+%   9   22   17   34   18 
+
+Next, we calculate the significance of the distribution with
+chi-squared test, using the \texttt{chisq.test} function which is part
+of the basic R configuration:
+
+<<FUNCTION.INTR chisq.test, eval=F, echo=T>>=
+chisq.test(table(shanghainese$FUNCTION=="INTR", shanghainese$TOPIC_MARKER))[c("statistic",
+"parameter","p.value")]
+@
+
+%Pearsons Chi-squared test
+%
+%data:  table(shanghainese$FUNCTION == "INTR", shanghainese$TOPIC_MARKER) 
+%X-squared = 53.8272, df = 4, p-value = 5.72e-11
+
+We follow this up first by calculating the two asymmetric Theil’s
+\textit{Uncertainty Coefficients} using the \texttt{associations}
+function from the \texttt{polytomous} package, i.e. the reduction of
+uncertainty concerning the feature (Row) given the topic marker
+(Column), i.e. \texttt{uc.RC}, and the reduction of uncertainty
+concerning the topic marker (Column) given the feature (Row),
+i.e. \texttt{uc.CR}:
+
+<<FUNCTION.INTR associations, eval=T, echo=T>>=
+associations(table(shanghainese$FUNCTION=="INTR",
+shanghainese$TOPIC_MARKER))[c("uc.RC","uc.CR")]
+@
+
+%$uc.RC
+%[1] 0.08233657
+
+%$uc.CR
+%[1] 0.03430202
+
+Secondly, we use the \texttt{chisq.posthoc} function in the
+\texttt{polytomous} package to assess the significance of the
+cell-wise divergences from homogeneity (i.e. the differences of the
+cellwise observed values in relation to the respective expected
+values) using the \textit{standardized Pearson residuals}:
+
+<<FUNCTION.INTR chisq.posthoc std.pearson.residuals, eval=T, echo=T>>=
+chisq.posthoc(table(shanghainese$FUNCTION=="INTR",
+shanghainese$TOPIC_MARKER))$cells$std.pearson.residuals
+@
+       
+%               ne          a        mo        zi         ma
+%  FALSE  4.896484 -0.8237076  1.464369 -6.315092  0.7779461
+%  TRUE  -4.896484  0.8237076 -1.464369  6.315092 -0.7779461
+
+The same values can also be extracted from the output of the standard
+\texttt{chisq.test} function:
+
+<<FUNCTION.INTR alternative, eval=T, echo=T>>=
+chisq.test(table(shanghainese$FUNCTION=="INTR", shanghainese$TOPIC_MARKER))$stdres
+@
+       
+%                ne          a         mo         zi         ma
+%  FALSE  4.8964842 -0.8237076  1.4643691 -6.3150918  0.7779461
+%  TRUE  -4.8964842  0.8237076 -1.4643691  6.3150918 -0.7779461
+
+We can then conveniently also extract from the output of the
+\texttt{chisq.posthoc} function a simplification of the results of
+the analysis of cellwise divergences using standardized Pearson
+residuals, with \texttt{'+'} indicating a significant cellwise
+divergence above the expected value, \texttt{'-'} a significant
+cellwise divergence above the expected value, and \texttt{'0'} a
+cellwise value that does not diverge significantly from the expected
+value. The threshold value for significance has been explicitly
+specified here as \texttt{std.pearson.residual.min=2} (which is the
+default value) as an argument to the function:
+
+<<FUNCTION.INTR chisq.posthoc signs, eval=T, echo=T>>=
+chisq.posthoc(table(shanghainese$FUNCTION=="INTR", shanghainese$TOPIC_MARKER),
+std.pearson.residual.min=2)$cells$std.pearson.residuals.sign
+@
+
+%       ne  a  mo   zi  ma
+%FALSE   +  0   0    -   0
+%TRUE    -  0   0    +   0
+
+Next, we consider the relationship of all values of the categorical
+variable \textsc{function} and the topic markers, again starting with
+their cross-tabulation:
+
+<<FUNCTION/TOPIC_MARKER crosstabulation, eval=T, echo=T>>=
+table(shanghainese$FUNCTION, shanghainese$TOPIC_MARKER)
+@
+      
+%          ne  a mo zi ma
+%  INTR    18 43 33 67 36
+%  COUNTER 13  4  4  4  6
+%  COND    15  4 27  1 11
+%  CONT    24  3  1  1 18
+%  EMPH    30 46 35 27 29
+
+Again, we evaluate the significance of the observed values diverging
+from expected values (representing a homogeneous distribution) using
+the \texttt{chisq.test} function:
+
+<<FUNCTION chisq.test, eval=T, echo=T>>=
+chisq.test(table(shanghainese$FUNCTION, shanghainese$TOPIC_MARKER))$p.value
+@
+
+%  Pearson Chi-squared test
+
+%data:  table(shanghainese$FUNCTION, shanghainese$TOPIC_MARKER) 
+%X-squared = 135.4606, df = 16, p-value < 2.2e-16
+
+As before, we also calculate the two asymmetric \textit{Uncertainty
+Coefficients} with the help of the \texttt{associations} function:
+
+<<FUNCTION associations, eval=T, echo=T>>=
+associations(table(shanghainese$FUNCTION,
+shanghainese$TOPIC_MARKER))[c("uc.RC","uc.CR")]
+@
+
+%$uc.RC
+%[1] 0.1005342
+
+%$uc.CR
+%[1] 0.08606379
+
+This time, we skip the actual values of the standardized Pearson
+residuals and go straight for the simplified results provided by the
+\texttt{chisq.posthoc} function:
+
+<<FUNCTION univariate summary results>>=
+chisq.posthoc(table(shanghainese$FUNCTION,
+shanghainese$TOPIC_MARKER))$cells$std.pearson.residuals.sign
+@
+
+%        ne a mo zi ma
+%INTR     - 0  0  +  0
+%COUNTER  + 0  0  0  0
+%COND     0 -  +  -  0
+%CONT     + -  -  -  +
+%EMPH     0 +  0  0  0
+
+In principle, we could replicate individually the above steps for each
+of the categorical variables and topic markers in the
+dataframe. However, we can in practice use the function
+\texttt{nominal} and in particular its \texttt{summary} method to
+create one dataframe with all the results of the univariate analyses
+for each value of each categorical variable. The function uses a
+transformation of the multinomial (categorical) variables in the
+original dataframe \texttt{shanghainese} into a number of equivalent
+binary/logical (TRUE/FALSE) ones using the
+\texttt{multinomial2logical} function in the \texttt{polytomous}
+package, stored in the dataframe \texttt{shanghainese.logical}. In
+all, the five categorical variables consist of 29 distinct values,
+which are each renamed with the format \texttt{variable.value},
+e.g. \texttt{FUNCTION.INTR}. The warnings are due to some variable
+values having low frequencies, which make the chi-squared test
+unreliable. We also transform the numeric variable
+\textsc{topic-length} as a factor for the time being, though we need
+to remember to revert this transformation later in the multivariate
+analysis:
+
+<<univariate table creation, eval=T, echo=T>>=
+
+shanghainese$TOPIC_LENGTH <- factor(shanghainese$TOPIC_LENGTH)
+
+shanghainese.logical <- multinomial2logical(shanghainese, outcome="TOPIC_MARKER",
+variables=c("TOPIC_LENGTH", "TOPIC_POS", "FUNCTION", "COMMENT_TYPE", "GENRE"),
+variable.value.separator=".")
+
+shanghainese.univariate <- nominal(TOPIC_MARKER ~ ., data=shanghainese.logical)
+@
+
+%shanghainese.univariate <- NULL
+%for(i in 1:29)
+%{ y <- table(shanghainese.logical[,i], shanghainese$TOPIC_MARKER);
+%  shanghainese.univariate <- rbind(shanghainese.univariate,
+%     unlist(c(colnames(shanghainese.logical)[i], length(which(shanghainese.logical[,i])),
+%     chisq.test(y)$p.value, associations(y)[c("uc.CR","uc.RC")],
+%     as.character(unlist(chisq.posthoc(y)$cells$std.pearson.residuals.sign[2,])))))
+%}
+%
+%shanghainese.univariate <- data.frame(shanghainese.univariate, stringsAsFactors=FALSE)
+%
+%colnames(shanghainese.univariate) <- c("feature","N","X2","uc.CR","uc.RC","ne","a","mo","zi","ma")
+%shanghainese.univariate$N <- as.numeric(shanghainese.univariate$N)
+%shanghainese.univariate$X2 <- as.numeric(shanghainese.univariate$X2)
+%shanghainese.univariate$uc.CR <- as.numeric(shanghainese.univariate$uc.CR)
+%shanghainese.univariate$uc.RC <- as.numeric(shanghainese.univariate$uc.RC)
+
+The resultant dataframe \texttt{shanghainese.univariate} is then the
+basis for the univariate results presented below. Notice that the
+notation of the association measures has been modified, from
+e.g. \texttt{uc.RC} and \texttt{uc.CR} to \texttt{uc.12} and
+\texttt{uc.21}, respectively, so that the number code '1' refers to
+the independent variable (corresponding to Row in the analysis above)
+and '2' to the dependent variable (corresponding to Column in the
+analysis above):
+
+<<univariate complete results, eval=T, echo=T>>=
+print(summary(shanghainese.univariate), max.print=NA)
+@
+
+%                 feature   N           X2        uc.CR       uc.RC ne a mo zi ma
+%1         TOPIC_LENGTH.1  34 1.308705e-05 0.0168652423 0.109258386  0 0  -  +  0
+%2         TOPIC_LENGTH.2 134 2.154920e-06 0.0228059348 0.063146908  0 0  -  +  0
+%3         TOPIC_LENGTH.3  98 7.161208e-01 0.0012896137 0.004194672  0 0  0  0  0
+%4         TOPIC_LENGTH.4  75 7.111676e-02 0.0055873361 0.021273426  0 0  -  0  0
+%5         TOPIC_LENGTH.5  47 9.028020e-04 0.0120643664 0.062294195  0 0  +  -  0
+%6         TOPIC_LENGTH.6  40 3.609746e-01 0.0028170834 0.016264057  0 0  0  0  0
+%7         TOPIC_LENGTH.7  24 2.912163e-04 0.0121867914 0.101846015  0 0  +  0  0
+%8         TOPIC_LENGTH.8  32 5.957061e-06 0.0196295593 0.132834101  0 0  +  -  -
+%9         TOPIC_LENGTH.9  11 1.424443e-01 0.0051348077 0.078167314  0 0  +  0  0
+%10       TOPIC_LENGTH.10   5 1.946677e-01 0.0041332791 0.118786911  0 +  0  0  0
+%11         TOPIC_POS.NOM 195 4.555367e-10 0.0325198665 0.078263710  + 0  -  +  0
+%12         TOPIC_POS.ADJ  25 1.176987e-03 0.0095503992 0.077428686  0 0  +  0  0
+%13         TOPIC_POS.ADV  63 7.870944e-04 0.0159383955 0.067734561  + 0  -  0  0
+%14      TOPIC_POS.CLAUSE 131 1.042881e-13 0.0405339837 0.113428214  - 0  +  -  0
+%15        TOPIC_POS.VERB  86 3.770036e-02 0.0062583897 0.021942350  0 +  0  0  0
+%16         FUNCTION.INTR 197 5.719865e-11 0.0343020227 0.082336565  - 0  0  +  0
+%17      FUNCTION.COUNTER  31 3.342759e-02 0.0055908715 0.038712506  + 0  0  0  0
+%18         FUNCTION.COND  58 2.846053e-08 0.0270858439 0.121469943  0 -  +  -  0
+%19         FUNCTION.CONT  47 3.105367e-11 0.0359456102 0.185604678  + -  -  -  +
+%20         FUNCTION.EMPH 167 3.302451e-02 0.0063638505 0.016079466  0 +  0  0  0
+%21   COMMENT_TYPE.CLAUSE 356 9.358436e-01 0.0005051995 0.001354353  0 0  0  0  0
+%22   COMMENT_TYPE.PHRASE  56 7.189567e-01 0.0012975106 0.005954955  0 0  0  0  0
+%23 COMMENT_TYPE.FINALTAG  50 7.357589e-01 0.0012805888 0.006340007  0 0  0  0  0
+%24 COMMENT_TYPE.SAMEMRKR  16 5.407820e-02 0.0046239153 0.052545779  0 +  0  0  0
+%25 COMMENT_TYPE.DIFFMRKR  22 3.349709e-01 0.0026880096 0.023973842  0 0  0  0  0
+%26            GENRE.MONO 258 4.687276e-15 0.0482395000 0.112091462  0 -  +  0  0
+%27            GENRE.CONV  79 4.485982e-11 0.0357690653 0.131934475  - -  0  0  +
+%28           GENRE.INTER 138 1.611980e-12 0.0379566204 0.103692285  0 -  +  0  -
+%29          GENRE.SCRIPT  25 2.420524e-01 0.0033582713 0.027226772  0 +  0  0  0
+
+\subsection{Topic markers and \textsc{topic-length}}
+
+As an alternative to treating \textsc{topic-length} as a categorical
+variable as above, we could scrutinize instead it as a normal numeric
+variable, and observe whether its distributions vary among the topic
+markers using Analysis of Variance. As a preliminary step, we have to
+remember to change the type of the \textsc{topic-length} variable from
+a factor back to numeric.
+
+<<ANOVA, eval=T, echo=T>>=
+shanghainese$TOPIC_LENGTH <- as.numeric(as.character(shanghainese$TOPIC_LENGTH))
+
+summary(aov(TOPIC_LENGTH ~ TOPIC_MARKER, data=shanghainese))
+@
+
+%              Df Sum Sq Mean Sq F value Pr(>F)    
+%TOPIC_MARKER   4  457.3  114.32   30.32 <2e-16 ***
+%Residuals    495 1866.5    3.77                   
+%---
+%Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Indeed, \textsc{topic-length} is significant in distinguishing the
+topic-markers, some have inherently longer or shorter topic-lengths
+than others, and the differences in the distributions are significant
+(overall). The results are the same if we use the more rigorous
+\textit{Kruskal-Wallis} test that treats topic-length as an ordinal
+rather than a continuous interval variable.
+
+<<Kruskal-Wallis, eval=T, echo=T>>=
+kruskal.test(TOPIC_LENGTH ~ TOPIC_MARKER, data=shanghainese)
+@
+
+% Kruskal-Wallis rank sum test
+
+%data:  TOPIC_LENGTH by TOPIC_MARKER 
+%Kruskal-Wallis chi-squared = 100.5923, df = 4, p-value < 2.2e-16
+
+Comparing the individual topic-markers, we get the following picture:
+
+<<TukeyHSD, eval=T, echo=T>>=
+TukeyHSD(aov(TOPIC_LENGTH ~ TOPIC_MARKER, data=shanghainese))
+@
+
+%  Tukey multiple comparisons of means
+%    95% family-wise confidence level
+
+%Fit: aov(formula = TOPIC_LENGTH ~ TOPIC_MARKER, data = shanghainese)
+
+%$TOPIC_MARKER
+%       diff         lwr         upr     p adj
+%a-ne   0.31 -0.44185298  1.06185298 0.7912139
+%mo-ne  1.61  0.85814702  2.36185298 0.0000001
+%zi-ne -1.28 -2.03185298 -0.52814702 0.0000397
+%ma-ne -0.50 -1.25185298  0.25185298 0.3626948
+%mo-a   1.30  0.54814702  2.05185298 0.0000283
+%zi-a  -1.59 -2.34185298 -0.83814702 0.0000001
+%ma-a  -0.81 -1.56185298 -0.05814702 0.0274468
+%zi-mo -2.89 -3.64185298 -2.13814702 0.0000000
+%ma-mo -2.11 -2.86185298 -1.35814702 0.0000000
+%ma-zi  0.78  0.02814702  1.53185298 0.0376370
+
+The pairwise cases with $P<.05$ \texttt{p adj} are the ones of
+interest. Basically, all the topic markers appear to have different
+\textsc{topic-length} distributions: \textit{mo} has the longest
+topics, \textit{zi} the shortest one, and the three others fall in
+between, which is also evident from the mean values of
+\textsc{topic-length} for the \textsc{topic-marker}s:
+
+<<topic-length-means, eval=T, echo=T>>=
+sapply(levels(shanghainese$TOPIC_MARKER),
+   function(i) mean(shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER==i]))
+@
+
+%  ne    a   mo   zi   ma 
+%3.86 4.17 5.47 2.58 3.36 
+
+Alternatively, we can use the more rigorous \textit{Wilcoxon rank-sum
+test} (which again assumes ordinal rather than continuous interval
+data) to see whether the differences between the length-wise adjacent
+topic-markers are significant. Indeed, even with this test,
+\textit{mo} is clearly apart from the rest as the longest, and
+\textit{zi} as the shortest, with the three other topic-markers as a
+group in the middle (which are not significantly distinguishable from
+their immediate neighbors in the group):
+
+<<Wilcox-tests, eval=T, echo=T>>=
+wilcox.test(shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="mo"],
+shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="a"])
+
+wilcox.test(shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="a"],
+shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="ne"])
+
+wilcox.test(shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="ne"],
+shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="ma"])
+
+wilcox.test(shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="ma"],
+shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER=="zi"])
+@
+
+%	Wilcoxon rank sum test with continuity correction
+
+%data:  shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "mo"] and shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "a"] 
+%W = 6752.5, p-value = 1.551e-05
+%alternative hypothesis: true location shift is not equal to 0 
+
+%  Wilcoxon rank sum test with continuity correction
+
+%data:  shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "a"] and shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "ne"] 
+%W = 5367.5, p-value = 0.3611
+%alternative hypothesis: true location shift is not equal to 0 
+
+%  Wilcoxon rank sum test with continuity correction
+
+%data:  shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "ne"] and shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "ma"] 
+%W = 5774.5, p-value = 0.05298
+%alternative hypothesis: true location shift is not equal to 0 
+
+%  Wilcoxon rank sum test with continuity correction
+
+%data:  shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "ma"] and shanghainese$TOPIC_LENGTH[shanghainese$TOPIC_MARKER == "zi"] 
+%W = 6129, p-value = 0.004361
+%alternative hypothesis: true location shift is not equal to 0 
+
+
+
+\section{Bivariate analysis}
+
+We start the bivariate analysis by one example case scrutinizing the
+association of two variable values, \textsc{topic-length} of 1 and
+\textsc{introductory function}. Now we use the dataframe
+\texttt{shanghainese.logical} with $TRUE/FALSE$ as a basis for our
+crosstabulation. We can note that these two variable values co-occur
+15 times:
+
+<<bivariate basic crosstabulation, eval=T, echo=T>>=
+table(shanghainese.logical[["TOPIC_LENGTH.1"]], shanghainese.logical[["FUNCTION.INTR"]])
+@       
+
+%        FALSE TRUE
+%  FALSE   284  182
+%  TRUE     19   15
+
+Using this crosstabulation we can perform similar individual analyses
+as at the univariate stage, focusing on the two asymmetric
+\textit{Uncertainty Coefficients} that we can calculate with the
+\texttt{associations} function. We can now notice that knowing that
+the \textsc{function} is \textsc{introductory} or not (Column) reduces
+our uncertainty of whether the \textsc{topic-length} is 1 or not (Row)
+by only $uc.RC=.001$, whereas knowing that the \textsc{topic-length}
+is 1 or not (Row) reduces our uncertainty of whether the
+\textsc{function} is \textsc{introductory} or not (Column) by even
+less, i.e. $uc.CR=.0005$.
+
+<<FUNCTION associations, eval=T, echo=T>>=
+associations(table(shanghainese.logical[["TOPIC_LENGTH.1"]],
+shanghainese.logical[["FUNCTION.INTR"]]))[c("uc.RC","uc.CR")]
+@
+
+%$uc.RC
+%[1] 0.001353318
+
+%$uc.CR
+%[1] 0.0005014306
+
+Again, we could perform the calculations individually on all pairings
+of each value of each categorical variable considered in our
+linguistic analysis. In practice, we can combine the essential results
+of all such pairings into one dataframe
+\texttt{shanghainese.bivariate} with again the function
+\texttt{nominal} and its \texttt{summary} method (N.B. excluding the
+outcome, \textsc{topic-marker}, in column 1). Notice again that the
+notation of the association measures has been modified, from
+e.g. \texttt{uc.RC} and \texttt{uc.CR} to \texttt{uc.12} and
+\texttt{uc.21}, respectively, so that the number code '1' refers to
+the first (independent) variable, i.e. \texttt{category1}
+(corresponding to Row in the analysis above), and '2' to the second
+(independent) variable, i.e. \texttt{category2} (corresponding to
+Column in the analysis above):
+
+<<bivariate table creation, eval=T, echo=T>>=
+shanghainese.bivariate <- nominal(. ~ ., data=shanghainese.logical[-1])
+summary(shanghainese.bivariate)
+@
+
+%shanghainese.bivariate <- NULL
+%for(i in 1:28)
+%   for(j in (i+1):29)
+%      shanghainese.bivariate <- rbind(shanghainese.bivariate,
+%         c(colnames(shanghainese.logical[,c(i,j)]),
+%            associations(table(shanghainese.logical[,i], shanghainese.logical[,j]))[c("uc.RC","uc.CR")],
+%            length(which(shanghainese.logical[,i])), length(which(shanghainese.logical[,j])),
+%            length(which(shanghainese.logical[,i] & shanghainese.logical[,j]))))
+%shanghainese.bivariate <- data.frame(shanghainese.bivariate)
+%colnames(shanghainese.bivariate) <- c("feature.1","feature.2","uc.RC","uc.CR","n.1","n.2","n.common")
+%shanghainese.bivariate[c("uc.RC","uc.CR","n.1","n.2","n.common")] <-
+%apply(shanghainese.bivariate[c("uc.RC","uc.CR","n.1","n.2","n.common")], c(1,2), as.numeric)
+%head(shanghainese.bivariate)
+%
+%       feature.1      feature.2      uc.RC      uc.CR n.1 n.2 n.common
+%1 TOPIC_LENGTH.1 TOPIC_LENGTH.2 0.08899314 0.03803633  34 134        0
+%2 TOPIC_LENGTH.1 TOPIC_LENGTH.3 0.06210295 0.03118088  34  98        0
+%3 TOPIC_LENGTH.1 TOPIC_LENGTH.4 0.04621127 0.02715929  34  75        0
+%4 TOPIC_LENGTH.1 TOPIC_LENGTH.5 0.02803365 0.02234398  34  47        0
+%5 TOPIC_LENGTH.1 TOPIC_LENGTH.6 0.02367189 0.02109599  34  40        0
+%6 TOPIC_LENGTH.1 TOPIC_LENGTH.7 0.01395581 0.01800311  34  24        0
+
+Now, we can extract those pairings for which the asymmetric
+\textit{Uncertainty Coefficient} $UC>.3$ in either direction, as
+follows (using the data frame \texttt{sumry.table} created with the
+\texttt{summary} method for the results of \texttt{nominal}), bringing
+forth only the following five cases:
+
+<<bivariate uc greater than .3, echo=T, eval=T>>=
+subset(summary(shanghainese.bivariate)$sumry.table, uc.12>.3 | uc.21>.3)
+@
+
+%shanghainese.bivariate[which(shanghainese.bivariate$uc.RC>.3 | shanghainese.bivariate$uc.CR>.3),]
+%              feature.1             feature.2      uc.RC     uc.CR n.1 n.2 n.common
+%319       FUNCTION.INTR         FUNCTION.EMPH 0.32826826 0.3455473 197 167        0
+%371 COMMENT_TYPE.CLAUSE   COMMENT_TYPE.PHRASE 0.26354706 0.4511873 356  56        0
+%372 COMMENT_TYPE.CLAUSE COMMENT_TYPE.FINALTAG 0.23172823 0.4279471 356  50        0
+%374 COMMENT_TYPE.CLAUSE COMMENT_TYPE.DIFFMRKR 0.09550244 0.3177257 356  22        0
+%402          GENRE.MONO           GENRE.INTER 0.37313297 0.4386850 258 138        0
+
+
+\section{Multivariate analysis -- polytomous logistic regression}
+
+\subsection{Fitting a polytomous model}
+
+We start the multivariate analysis by fitting a polytomous logistic
+regression model with the function \texttt{polytomous} within the
+\texttt{polytomous} package, assigning the results to
+\texttt{shanghainese.polytomous}. First, however, we must remember to transform
+the variable \textsc{topic-length} into numeric form:
+
+<<polytomous model fit, echo=T, eval=T>>=
+shanghainese$TOPIC_LENGTH <- as.numeric(shanghainese$TOPIC_LENGTH)
+
+shanghainese.polytomous <- polytomous(TOPIC_MARKER ~ TOPIC_LENGTH + TOPIC_POS +
+FUNCTION + COMMENT_TYPE + GENRE, data=shanghainese)
+@
+
+A summary of the key results of the polytomous logistic regression
+model can be printed as follows, with the argument
+\texttt{max.print=NA} so that all the odds will be output (instead of
+only the first 10 lines which is the default setting):
+
+<<polytomous model summary, echo=T, eval=T>>==
+print(summary(shanghainese.polytomous), max.print=NA)
+@
+
+%Formula:
+%TOPIC_MARKER ~ TOPIC_LENGTH + TOPIC_POS + FUNCTION + COMMENT_TYPE + 
+%    GENRE
+%
+%Heuristic:
+%one.vs.rest
+
+%Odds:
+%                           ne        a       mo       zi       ma
+%(Intercept)           0.08782   0.2628 0.009559    5.804   0.2585
+%COMMENT_TYPEDIFFMRKR (0.8791)  (1.634) (0.6193) (0.4156)    (1.1)
+%COMMENT_TYPEFINALTAG  (1.261) (0.5884)   (1.22)  (0.855) (0.9522)
+%COMMENT_TYPEPHRASE    (0.568) (0.7328)   (1.42)  (1.283)   (1.42)
+%COMMENT_TYPESAMEMRKR (0.3588)  (2.456)  (1.632) (0.5519) (0.5734)
+%FUNCTIONCOND            7.556   0.3025  (1.313)  0.07156  (1.055)
+%FUNCTIONCONT            12.87    0.281  0.09028  0.02395    2.697
+%FUNCTIONCOUNTER         9.425 (0.8001) (0.3065)   0.1788  (1.151)
+%FUNCTIONEMPH            2.833  (1.364) (0.6123)    0.525   (1.07)
+%GENRECONV              0.3315  0.03177    4.286 (0.8568)    4.046
+%GENREINTER           (0.8097)   0.1964    9.254  (1.043) (0.5909)
+%GENRESCRIPT          (0.2833)  (1.688)  (3.219) (0.4916)  (1.011)
+%TOPIC_LENGTH            1.185  (1.122)    1.437   0.5414   0.8104
+%TOPIC_POSADJ         (0.2623) (0.5769)    12.54   0.1827  (1.462)
+%TOPIC_POSADV          (1.629)  (1.119) (0.2926) (0.5171)  (1.307)
+%TOPIC_POSCLAUSE        0.2126 (0.9687)     2.99 (0.7534)  (2.192)
+%TOPIC_POSVERB          0.4591  (1.815)    2.709   0.2649  (1.875)
+
+%Null deviance:              1609  on  2500  degrees of freedom
+%Residual (model) deviance:  1191  on  2415  degrees of freedom
+
+%R2.likelihood:  0.26              
+%AIC:            1361              
+%BIC:            1719             
+
+Notice that one value per each categorical predictor variable is
+"missing". This is obligatory since the algorithm for fitting a
+logistic regression model cannot converge if all values of a
+categorical variable are included in the model (due to exact
+collinearity). However, the aggregate effects of these excluded,
+\textit{default} or \textit{reference} categories are represented
+jointly in the \texttt{Intercept} values. The \texttt{polytomous} and
+the underlying \texttt{glm} functions automatically select the first
+level/category of a factor as such a default value that will not
+receive odds/logodds estimates of their own. These default levels will
+normally be the alphabetically first ones for each factor, unless
+otherwise specified. Nevertheless, one can use the \texttt{relevel} or
+\texttt{reorder} functions to redefine these default levels.  For the
+\texttt{shanghainese} data, we have thus selected as the default
+categories \textsc{clause} for \textsc{comment-type},
+\textsc{introductory} for \textsc{function}, \textsc{monologue} for
+\textsc{genre}, and \textsc{nominal} for \textsc{part-of-speech}. As
+an example we could set \textsc{emphatic} instead as the default
+category for \textsc{function} as follows (this will not matter with
+respect to the results below since the polytomous model has already
+been fit):
+
+<<shanghainese factor relevel>>=
+levels(shanghainese$FUNCTION)
+shanghainese$FUNCTION <- relevel(shanghainese$FUNCTION,"EMPH")
+levels(shanghainese$FUNCTION)
+@
+
+Returnung to the model, we can specifically extract various statistics
+concerning its fit, e.g. $R_L^2$ and $Accuracy$, as follows:
+
+<<polytomous model performance, eval=T, echo=T>>=
+shanghainese.polytomous$statistics$R2.likelihood
+
+shanghainese.polytomous$statistics$accuracy
+@
+
+%[1] 0.2599525
+%[1] 0.5
+
+The recall statistics for each topic marker can also be retrieved:
+
+<<polytomous recall, eval=T, echo=T>>=
+shanghainese.polytomous$statistics$recall.predicted
+@
+
+%  ne    a    mo   zi   ma 
+%0.39 0.57 0.61 0.57 0.36
+
+And we can get a crosstabulation of the predicted topic markers
+against the originally occurring ones:
+
+<<polytomous model prediction crosstabulation, eval=T, echo=T>>=
+shanghainese.polytomous$statistics$crosstable
+@
+
+%        ne  a  mo   zi  ma 
+%  ne    39 20  21   12   8
+%  a      8 57   8   23   4
+%  mo     6 16  61   11   6
+%  zi     6 23   6   57   8
+%  ma    17 22  11   14  36
+
+\subsection{Probability estimates and examplary sentences}
+
+The element fitted in the polytomous logistic regression model
+contains probability estimates for all topic markers in all the
+contexts/sentences in the original data that was used to fit the
+model:
+
+<<polytomous model predicted probabilities, eval=T, echo=T>>=
+head(shanghainese.polytomous$fitted)
+@
+
+%          ne          a          mo          zi        ma
+%1 0.38642999 0.01578725 0.409326035 0.001323448 0.1871333
+%2 0.10868093 0.26752516 0.170456081 0.181640481 0.2716974
+%3 0.04686899 0.22413264 0.333330553 0.182929151 0.2127387
+%4 0.53452365 0.18676178 0.001444502 0.111038765 0.1662313
+%5 0.52918897 0.04650779 0.025870388 0.197656422 0.2007764
+%6 0.16639150 0.30712478 0.020096350 0.299564515 0.2068229
+
+We can scrutinize visually the overall distributions of the
+probability estimates, ranked within the sentences, by using the
+\texttt{plot} method for fitted \texttt{polytomous} model objects, as
+follows, producing \textit{Figure 1} in Han et al. (in press):
+
+<<probs figure, echo=T, eval=F>>=
+plot(shanghainese.polytomous, values="probabilities", panes="multiple")
+@
+
+The matrix of probability estimates allows us to do various
+operations, e.g. sorting the probabilities (horizontally) for each
+context/sentence (N.B. with the resultant matrix transposed, and the
+probability estimates thus in columns in increasing order, when
+\texttt{sort} is used without any arguments together with
+\texttt{apply}):
+
+<<polytomous model sorted probabilities, eval=T, echo=T>>=
+apply(shanghainese.polytomous$fitted,1,sort)[,1:5]
+@
+
+
+Then, the resultant matrix contains e.g. the second highest and
+maximum probability estimates for each sentence on the fourth and
+fifth lines, respectively (with with the first five sentences,
+i.e. columns, selected below):
+
+<<polytomous model sorted probabilities two highest, eval=T, echo=T>>=
+apply(shanghainese.polytomous$fitted,1,sort)[4:5,1:5]
+@
+
+%            1         2         3         4         5
+%[1,] 0.386430 0.2675252 0.2241326 0.1867618 0.2007764
+%[2,] 0.409326 0.2716974 0.3333306 0.5345236 0.5291890
+
+This can be used to find out the number of cases/sentences for which
+the maximum and second highest probability estimates are both $P>0.3$:
+
+<<number of two-ways interchangeable contexts, eval=T,echo=T>>=
+length(which(apply(apply(shanghainese.polytomous$fitted,1,sort)[4:5,],2,function(x) all(x>0.3))))
+@
+
+% [1] 154
+
+The element fitted can also be manipulated vertically (by each topic
+marker) to provide us with the indices of those sentences which have
+received the highest probability estimates (for each topic marker);
+here we opt to see only the top five sentences for each topic marker:
+
+<<indices of best exemplars, eval=T, echo=T>>=
+apply(shanghainese.polytomous$fitted, 2, function(x) order(x, decreasing=T))[1:5,]
+@
+
+%      ne   a  mo   zi  ma
+%[1,] 164 185 243  470 222
+%[2,] 271 300 327  476 235
+%[3,]  50 176 354  478  40
+%[4,]   8 330 310  449 292
+%[5,] 282 122 356  472 215
+
+Using the above indices, we can then extract the probability estimates
+for all five topic markers for the selected sentences \#222, \#185, and
+\#40 discussed in the text.
+
+<<exemplar probabilities, eval=T, echo=T>>=
+round(shanghainese.polytomous$fitted[222,],3)
+
+round(shanghainese.polytomous$fitted[185,],3)
+
+round(shanghainese.polytomous$fitted[40,],3)
+@
+
+%   ne     a    mo    zi    ma
+%0.125 0.003 0.034 0.015 0.822 
+
+%   ne     a    mo    zi    ma
+%0.072 0.688 0.095 0.035 0.109 
+
+%   ne     a    mo    zi    ma
+%0.148 0.004 0.049 0.008 0.791 
+
+Finally, we can evaluate the dispersion of the topic markers for each
+sentence/context using the standard deviation (calculated with the
+standard function \texttt{sd}), which allows us to extract those sentences
+for which the dispersion is the smallest, suggesting that the
+probability estimates for all five topic markers are overall closest
+to each other:
+
+<<most interchangeable cases, eval=T, echo=T>>=
+order(apply(shanghainese.polytomous$fitted,1,sd))[1:5]
+@
+
+%[1]  94 296   2 102 365
+
+Then, we can look up the probability estimates for the most
+equiprobable sentence \#94:
+
+<<probabilities for interchageable case, eval=T, echo=T>>=
+round(shanghainese.polytomous$fitted[94,],3)
+@
+
+%   ne      a    mo    zi    ma
+%0.135 0.163 0.273 0.232 0.197 
+
+%We can also scrutinize visually the overall distributions of the
+%probability estimates, ranked within the sentences, by using the
+%\texttt{plot} for fitted \texttt{polytomous} model objects, as
+%follows:
+
+%<<probs, fig=T, eval=T>>=
+%plot(shanghainese.polytomous, values="probabilities", panes="multiple")
+%@
+
+%\includegraphics[width=0.8\textwidth]{shanghainese-probs.pdf}
+
+%Figure 1. Densities of the distributions of the estimated
+%probabilities by rank order for all instances in the data ($n=500$)
+
+\end{document}

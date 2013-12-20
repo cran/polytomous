@@ -95,4 +95,4 @@ predict(think.polytomous, newdata=think[1:20,], type="choice")
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate category classif }

@@ -162,5 +162,5 @@ summary(think.polytomous.lmer)
 
 }
 
-\keyword{ regression }
+\keyword{ regression multivariate category }
 

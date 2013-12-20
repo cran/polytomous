@@ -1,0 +1,146 @@
+\documentclass{article}
+\usepackage{Sweave}
+\usepackage[english]{babel}
+\selectlanguage{english}
+\usepackage[utf8]{inputenc}
+
+\DefineVerbatimEnvironment{Sinput}{Verbatim}
+{formatcom={\vspace{-1.5ex}},fontshape=sl,      % changed -2.5 to -1.5
+  fontfamily=courier,fontseries=b, fontsize=\scriptsize}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}
+{formatcom={\vspace{-2.5ex}},fontfamily=courier,fontseries=b,%
+  fontsize=\scriptsize}
+
+\SweaveOpts{engine=R, eps=FALSE, pdf=TRUE, strip.white=all}
+\SweaveOpts{prefix=TRUE, prefix.string=figs/fig, include=FALSE}
+
+% \VignetteIndexEntry{Extracting exemplars and prototypes}
+
+\begin{document}
+
+\title{Extracting exemplars and prototypes}
+\author{Antti Arppe}
+\maketitle
+
+\section{Fitting a polytomous logistic regression model}
+
+Before carrying out the statistical analyses, we need to invoke the
+\texttt{polytomous} package to make it available within R, having
+installed the package earlier. As subsequent preliminary steps, we
+load in the \texttt{think} data frame.
+
+<<data, eval=T, echo=T>>=
+library(polytomous)
+data(think)
+@
+
+Next, we transform using the \texttt{multinomial2logical} function the
+multinomial predictors into dummy predictor variables , which are
+simply \textsc{true} or \textsc{false} for each categorical value of
+the selected multinomial variables. The \texttt{think} data frame has
+three extralinguistic variables that we have decided to exclude from
+the following statistical modeling, namely \texttt{Register},
+\texttt{Section}, and \texttt{Author} (which are columns 25, 26, and
+27 in the original data frame). The results of this conversion are
+stored in the data frame \texttt{think.logical}.
+
+<<logical, eval=T, echo=T>>=
+names(think)
+
+think.logical <- multinomial2logical(data=think, outcome="Lexeme", variables=names(think)[2:24])
+@
+
+With logical predictor variables we need to exclude per each of the
+original multinomial predictors one variable value so that we will not
+end up with exact multicollinearity. Often, one ends up excluding
+those variable values (individual categories/classes) that can be
+considered the least surprising, or default values. In the case of the
+\texttt{think} data frame, such default variable values are often
+either designated as \texttt{None} (i.e. entirely absent) or
+\texttt{Other} (typically a lump category of the most infrequent
+variable values). For two multinomial variables,
+\texttt{ClauseEquivalent} and \texttt{Overt}, with only two fully
+complementary values in each case, one has to base the choice on one's
+domain knowledge, thus deciding to exclude
+\texttt{ClauseEquivalent.FiniteVerbChain} and \texttt{Overt.Overt}
+(explicit syntactic \textit{Subject} argument which is not obligatory
+for \textsc{first} and \textsc{second} person verb forms in
+Finnish). We also need to leave out the first column with the dependent
+outcome variable \texttt{Lexeme} (which has been retained in
+multinomial form. After the preceding exclusions, we are left with the
+following 45 logical predictor variables, which we want to incorporate
+into a formula for the prediction of the outcome\texttt{Lexeme}
+through a few intermediate stages. Finally, the resultant multivariate
+formula is stored in \texttt{think.formula}:
+
+The names of all the dummy variables \texttt{think.logical} are the
+following (excluding the first column with the dependent outcome
+variable):
+
+<<formula, echo=T>>=
+names(think.logical)[-1]
+@
+
+The names of the non-default dummy variables are the following:
+
+<<formula2, eval=T, eval=T>>=
+grep("(Other)|(None)|(FiniteVerbChain)|(Overt)",
+   names(think.logical)[-1],value=T,invert=T)
+@
+
+This character vector can then be transformed into a formula as
+follows:
+
+<<formula3, eval=T, echo=T>>=
+paste(grep("(Other)|(None)|(FiniteVerbChain)|(Overt)",
+   names(think.logical)[-1],value=T,invert=T),collapse="")
+paste("Lexeme",paste(grep("(Other)|(None)|(FiniteVerbChain)|(Overt)",
+   names(think.logical)[-1],value=T,invert=T),collapse=" + "),sep=" ~ ")
+as.formula(paste("Lexeme",
+   paste(grep("(Other)|(None)|(FiniteVerbChain)|(Overt)",
+   names(think.logical)[-1],value=T,invert=T),collapse=" + "),sep=" ~ "))
+think.formula <- as.formula(paste("Lexeme", 
+   paste(grep("(Other)|(None)|(FiniteVerbChain)|(Overt)",
+   names(think.logical)[-1],value=T,invert=T),collapse=" + "),sep=" ~ "))
+@
+
+Now we can fit a polytomous logistic regression model, the result of
+which we assign to the data frame \texttt{think.polytomous}:
+
+<<polytomous, eval=T, echo=T>>=
+think.polytomous <- polytomous(think.formula, data=think.logical)
+
+print(summary(think.polytomous),max.print=NA)
+@
+
+The polytomous logistic regression model is the basis of both
+extracting a set of exemplary exemplars as well as sets of properties
+(variable values) which are prototypical for each outcome
+(i.e. \texttt{Lexeme}).
+
+\section{Extracting exemplars and prototypes}
+
+Having fit the polytomous logistic regression model, we can use it as
+a basis for extracting individual contexts which are most exemplary of
+the various outcomes, using the function
+\texttt{extract.exemplars}. This function takes the dataset
+incorporated in the fitted result and applies \textit{Hierarchical
+Cluster Analysis} on it with the function \texttt{hclust}, using
+\texttt{method="binary"} for distance measure and
+\texttt{method="ward"} for the distance-based clustering:
+
+<<exemplars, eval=T, echo=T>>=
+extract.exemplars(think.polytomous, n.clusters=100)
+@
+
+Even though one could select manually out of the results of the fitted
+polytomous logistic regression model those properties that together
+form the abstract prototypes per each outcome \texttt{Lexeme}, we can
+use the convenience function \texttt{extra.prototypes} to directly get
+these, sorted in terms of decreasing odds for each outcome.
+
+<<prototypes, eval=T, echo=T>>=
+extract.prototypes(think.polytomous)
+@
+
+\end{document}

@@ -169,4 +169,4 @@ plot(think.polytomous, values="probabilities", type="sort", pch=".",
 plot(think.polytomous, values="probabilities", type="sort", pch=".", panes="multiple")
 
 }
-\keyword{ classif }
+\keyword{ regression multivariate category classif }

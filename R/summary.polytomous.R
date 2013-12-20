@@ -8,7 +8,6 @@ function(object, ...)
 
 print.summary.polytomous <- function(x, digits=max(3,getOption("digits")-3), parameter="odds", max.parameter=ifelse(parameter=="odds",10000,100), p.critical=.05, max.print=10, cycles=0, max.denominator=0, ...)
 { 
-  require(MASS, quietly=TRUE)
 
   cat("\nFormula:\n")
   print(x$formula)
@@ -19,7 +18,7 @@ print.summary.polytomous <- function(x, digits=max(3,getOption("digits")-3), par
 
   if("mixed" %in% class(x))
     { cat("\nRandom effects:\n")
-      sd.random <- unlist(x$model@ST)*lme4:::sigma(x$model) # summary(x$model)@sigma
+      sd.random <- unlist(getME(x$model,"ST"))*sigma(x$model)
       var.random <- sd.random^2
       names.random <- names(x$model@flist)
       summary.random <- data.frame(cbind(names.random,signif(var.random,digits),signif(sd.random,digits)))

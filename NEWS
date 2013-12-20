@@ -1,0 +1,18 @@
+Changes for R-package polytomous
+
+Changes in version 0.1.6 (Dec 20th, 2012) (since version 0.1.4)
+Implementer: Antti Arppe <antti.arppe@iki.fi>
+
+* general modifications and fixes to several functions for
+  implementing polytomous logistic regression to make the package
+  compatible with the new version of the 'lme4' package
+
+* new function 'nominal' and associated methods, new dataset
+  'shanghainese', and vignette 'shanghainese' added to provide
+  syntactic sugar for running multiple univariate and bivariate
+  analyses of categorical variables based on 'chisq.posthoc' and
+  'associations' used in Han, Arppe & Newman (forthc.)
+
+* two functions 'extract.exemplars' and 'extract.prototypes' as well
+  as vignette 'exemplars2prototypes' added to describe analyses in
+  Divjak & Arppe (2013)

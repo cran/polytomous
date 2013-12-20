@@ -125,36 +125,34 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
       predictors.random <- unlist(lapply(grep("\\|",predictors,value=TRUE), function(x) paste(c("(",x,")"),collapse="")));
       formula.poisson <- paste(c(formula.start, outcome, unlist(lapply(predictors.fixed, function(x) paste(c(outcome,x),collapse=":"))),predictors.random),collapse=" + ");
 
-      require(lme4, quietly=TRUE);
-      model <- try(lmer(formula.poisson, data.poisson, family=poisson),silent=TRUE);
+      model <- try(glmer(formula.poisson, data.poisson, family=poisson),silent=TRUE);
       if("try-error" %in% class(model))
-        stop("Following error(s) in fitting reformulated model using 'lmer(..., family=poisson)':\n",model[1])
+        stop("Following error(s) in fitting reformulated model using 'glmer(..., family=poisson)':\n",model[1])
 
-      coefs.mer <- function(object)
-      { 
-        fcoef <- object@fixef
-        dims <- object@dims
-        vcov <- vcov(object)
-        corF <- vcov@factors$correlation
+      # coefs.mer <- function(object)
+      # { 
+      #   fcoef <- fixef(object)
+      #   dims <- object@dims
+      #   vcov <- vcov(object)
+      #   corF <- vcov@factors$correlation
 
-        coefs <- cbind(Estimate = fcoef, `Std. Error` = corF@sd)
-        if (nrow(coefs) > 0) {
-           if (!dims[["useSc"]]) {
-               coefs <- coefs[, 1:2, drop = FALSE]
-               stat <- coefs[, 1]/coefs[, 2]
-               pval <- 2 * pnorm(abs(stat), lower = FALSE)
-               coefs <- cbind(coefs, `z value` = stat, `Pr(>|z|)` = pval)
-           }
-           else {
-               stat <- coefs[, 1]/coefs[, 2]
-               coefs <- cbind(coefs, `t value` = stat)
-           }
-        }
-        return(coefs)
-      }
-
-      coefficients <- coefs.mer(model)
-#      coefficients <- slot(summary(model),"coefs");
+      #   coefs <- cbind(Estimate = fcoef, `Std. Error` = corF$sd)
+      #   if (nrow(coefs) > 0) {
+      #       if (!dims[["useSc"]]) {
+      #           coefs <- coefs[, 1:2, drop = FALSE]
+      #           stat <- coefs[, 1]/coefs[, 2]
+      #           pval <- 2 * pnorm(abs(stat), lower.tail = FALSE)
+      #           coefs <- cbind(coefs, `z value` = stat, `Pr(>|z|)` = pval)
+      #       }
+      #       else {
+      #           stat <- coefs[, 1]/coefs[, 2]
+      #           coefs <- cbind(coefs, `t value` = stat)
+      #       }
+      #    }
+      #    return(coefs)
+      # }
+      
+      coefficients <- coef(summary(model)); # coefs.mer(model)
 
       predictors.classes <- c("(Intercept)", outcome, unique(gsub(paste(c("^",outcome,"(",paste(outcomes,collapse="|"),"):"),collapse=""),"",rownames(coefficients)[(n.outcomes+1):(nrow(coefficients))])));
       logodds <- odds <- p.values <- matrix(NA, (nrow(coefficients)/n.outcomes)+1, n.outcomes, dimnames=list(predictors.classes, outcomes));
@@ -230,7 +228,7 @@ function(formula, data, frequency=NA, variables.ordered=NULL, include.Observatio
   statistics <- c(list(df.null=df.null, df.model=df.model, AIC.model=AIC.model, BIC.model=BIC.model), statistics)
 
   if(model.type=="mixed")
-    { sd.ranef <- lapply(model@ST, function(x) x*lme4:::sigma(model)) # summary(model)@sigma)
+    { sd.ranef <- lapply(getME(model,"ST"), function(x) x*getME(model,"sigma"))
       var.ranef <- lapply(sd.ranef, function(x) x^2)
       names(sd.ranef) <- names(var.ranef) <- names(model@flist)
       statistics <- c(statistics, sd.ranef=list(sd.ranef), var.ranef=list(var.ranef))

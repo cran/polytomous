@@ -79,7 +79,7 @@ function(object, ..., statistic = "deviance", test = "Chisq", outcome.specific =
        { if(object$heuristic!="one.vs.rest")
            stop("'outcome.specific=TRUE' only applicable for a 'polytomous' object fit using the 'one.vs.rest' heuristic.")
 
-         model <- lapply(object$model, function(x) anova.glm(x, dispersion = NULL, test = test));
+         model <- lapply(object$model, function(x) anova(x, dispersion = NULL, test = test));
          outcomes <- object$outcomes;
          n.outcomes <- length(outcomes);
          deviance <- df <- p.values <- vector("list", n.outcomes);
